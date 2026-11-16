@@ -73,15 +73,15 @@ final class WorkingTimeApiController extends AbstractFOSRestController
             $workingTime = $day->getWorkingTime();
             $days[] = [
                 'date' => $day->getDay()->format('Y-m-d'),
-                'expectedMinutes' => $workingTime?->getExpectedTime() ?? 0,
-                // Kimai stores recorded time in seconds; the contract's expected time is in minutes.
+                // Kimai keeps both in seconds (the contract's hours too, as its DurationType form saves them).
+                'expectedMinutes' => (int) round(($workingTime?->getExpectedTime() ?? 0) / 60),
                 'recordedMinutes' => (int) round(($workingTime?->getActualTime() ?? 0) / 60),
             ];
         }
 
         return $this->json([
             'month' => $monthDate->format('Y-m'),
-            'expectedMinutes' => $month->getExpectedTime($until),
+            'expectedMinutes' => (int) round($month->getExpectedTime($until) / 60),
             'recordedMinutes' => (int) round($month->getActualTime() / 60),
             'days' => $days,
         ], Response::HTTP_OK);

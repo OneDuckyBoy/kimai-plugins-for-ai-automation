@@ -46,8 +46,9 @@ GET /api/working-time/month?month=YYYY-MM[&user=<email|username>]
   expectedMinutes, recordedMinutes }] }`. Expected minutes only count up to
   today within the month.
 - Setup so it works: each user's contract preferences must be set
-  (`work_contract_type=day` + `work_monday..sunday` minutes; the admin's were
-  set manually for testing). Without them expected minutes are 0.
+  (`work_contract_type=day` + `work_monday..sunday` in seconds, as Kimai's
+  user settings save them: 28800 = 8h). The API cannot set them; use the
+  user's Contract settings in Kimai. Without them expected minutes are 0.
 - Reload after editing: `docker exec kimai-kimai-1 /opt/kimai/bin/console
   cache:clear --env=prod` (the bind mount is live; only the cache needs to
   forget the old container).
