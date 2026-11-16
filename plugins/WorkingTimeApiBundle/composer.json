@@ -1,0 +1,18 @@
+{
+  "name": "orbisds/working-time-api",
+  "description": "REST endpoint for expected vs recorded working time per user and month",
+  "type": "kimai-plugin",
+  "version": "0.1.0",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "OrbisDS"
+    }
+  ],
+  "extra": {
+    "kimai": {
+      "require": 25500,
+      "name": "Working Time API"
+    }
+  }
+}

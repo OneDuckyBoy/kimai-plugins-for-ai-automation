@@ -1,0 +1,4 @@
+working_time_api_month:
+  path: /api/working-time/month
+  methods: [GET]
+  controller: KimaiPlugin\WorkingTimeApiBundle\Controller\WorkingTimeApiController::monthAction
