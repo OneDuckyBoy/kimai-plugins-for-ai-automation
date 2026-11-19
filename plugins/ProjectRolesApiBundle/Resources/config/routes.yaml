@@ -1,9 +1,0 @@
-project_roles_api_get:
-  path: /api/project-roles
-  methods: [GET]
-  controller: KimaiPlugin\ProjectRolesApiBundle\Controller\ProjectRolesApiController::rolesAction
-
-project_roles_api_set:
-  path: /api/project-roles
-  methods: [POST]
-  controller: KimaiPlugin\ProjectRolesApiBundle\Controller\ProjectRolesApiController::setAction
