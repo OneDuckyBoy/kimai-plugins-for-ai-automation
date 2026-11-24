@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+<div class="row">
+    <div class="col-md-4">
+        {% embed '@theme/embeds/card.html.twig' %}
+            {% block box_title %}Project{% endblock %}
+            {% block box_body %}
+                {{ form_start(projectForm) }}
+                {{ form_row(projectForm.project) }}
+                {{ form_row(projectForm.open) }}
+                {{ form_end(projectForm) }}
+            {% endblock %}
+        {% endembed %}
+
+        {% if projectId > 0 %}
+            {% embed '@theme/embeds/card.html.twig' %}
+                {% block box_title %}{{ editUserId > 0 ? 'Edit assignment' : 'Assign' }}{% endblock %}
+                {% block box_body %}
+                    {{ form_start(setForm) }}
+                    {{ form_row(setForm.userId) }}
+                    {{ form_row(setForm.roleId) }}
+                    {{ form_row(setForm.active) }}
+                    {{ form_row(setForm.save) }}
+                    {{ form_end(setForm) }}
+                    {% if editUserId > 0 %}
+                        <a href="{{ path('orbis_roles_members', {project: projectId}) }}">&larr; Cancel editing</a>
+                    {% endif %}
+                {% endblock %}
+            {% endembed %}
+        {% endif %}
+    </div>
+    <div class="col-md-8">
+        {% embed '@theme/embeds/card.html.twig' %}
+            {% block box_title %}Project #{{ projectId }} members{% endblock %}
+            {% block box_body %}
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>Person</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th class="text-center">Active</th>
+                        <th>Valid</th>
+                        <th class="actions">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if members is empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No assignments yet.</td>
+                        </tr>
+                    {% endif %}
+                    {% for m in members %}
+                        <tr>
+                            <td>{{ m.username }}</td>
+                            <td>{{ m.email }}</td>
+                            <td>{% if m.role %}<span class="badge" style="background-color:{{ m.role_color }};color:{{ m.role_text_color }}">{{ m.role }}</span>{% else %}<span class="text-muted">(none)</span>{% endif %}</td>
+                            <td class="text-center"><span class="badge {{ m.active ? 'text-bg-success' : 'text-bg-secondary' }}">{{ m.active ? 'Yes' : 'No' }}</span></td>
+                            <td class="text-muted">{{ m.valid_from ? m.valid_from|date('Y-m-d') : '—' }} … {{ m.valid_to ? m.valid_to|date('Y-m-d') : '—' }}</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary modal-ajax-form" href="{{ path('orbis_roles_members_edit', {project: projectId, user: m.user_id}) }}">Edit</a>
+                                <a class="btn btn-sm btn-outline-danger" href="{{ path('orbis_roles_members_delete', {project: projectId, user: m.user_id}) }}" onclick="return confirm('Remove {{ m.username }} from this project?');">Remove</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endblock %}
+        {% endembed %}
+    </div>
+</div>
+{% endblock %}

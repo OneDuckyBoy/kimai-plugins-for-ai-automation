@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+    {% set formEditTemplate = kimai_context.modalRequest ? 'default/_form_modal.html.twig' : 'default/_form.html.twig' %}
+    {% set formOptions = {
+        'title': 'Edit assignment — ' ~ username,
+        'form': form,
+        'back': path('orbis_roles_members')
+    } %}
+    {% include formEditTemplate with formOptions %}
+{% endblock %}

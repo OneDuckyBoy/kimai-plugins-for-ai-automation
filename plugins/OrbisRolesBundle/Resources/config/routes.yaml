@@ -1,0 +1,34 @@
+orbis_roles_project_roles:
+  path: /api/project-roles
+  methods: [GET]
+  controller: KimaiPlugin\OrbisRolesBundle\Controller\ProjectRolesController::rolesAction
+
+orbis_roles_admin_list:
+  path: /admin/project-roles
+  methods: [GET, POST]
+  controller: KimaiPlugin\OrbisRolesBundle\Controller\ProjectRolesAdminController::listRoles
+
+orbis_roles_admin_toggle:
+  path: /admin/project-roles/{id}/toggle
+  methods: [GET]
+  controller: KimaiPlugin\OrbisRolesBundle\Controller\ProjectRolesAdminController::toggleRole
+
+orbis_roles_admin_delete:
+  path: /admin/project-roles/{id}/delete
+  methods: [GET]
+  controller: KimaiPlugin\OrbisRolesBundle\Controller\ProjectRolesAdminController::deleteRole
+
+orbis_roles_members:
+  path: /admin/project-roles/members
+  methods: [GET, POST]
+  controller: KimaiPlugin\OrbisRolesBundle\Controller\ProjectRolesAdminController::members
+
+orbis_roles_members_edit:
+  path: /admin/project-roles/memberships/{project}/{user}/edit
+  methods: [GET, POST]
+  controller: KimaiPlugin\OrbisRolesBundle\Controller\ProjectRolesAdminController::editMembership
+
+orbis_roles_members_delete:
+  path: /admin/project-roles-memberships/delete
+  methods: [GET]
+  controller: KimaiPlugin\OrbisRolesBundle\Controller\ProjectRolesAdminController::deleteMembership

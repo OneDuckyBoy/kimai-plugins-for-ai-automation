@@ -1,0 +1,18 @@
+{
+  "name": "orbisds/orbis-roles",
+  "description": "Per-project roles (project manager and others) with a manages_project flag, a membership model and a scope service; read route for ai-automation",
+  "type": "kimai-plugin",
+  "version": "0.1.0",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "OrbisDS"
+    }
+  ],
+  "extra": {
+    "kimai": {
+      "require": 25500,
+      "name": "Orbis Roles"
+    }
+  }
+}
