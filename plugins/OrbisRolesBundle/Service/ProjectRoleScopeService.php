@@ -79,18 +79,38 @@ final class ProjectRoleScopeService
         }
     }
 
-    /** The people + roles on one project, for the Excel Role column and the PM grouping. */
-    public function rolesForProject(int $projectId): array
+    /**
+     * The people + roles on one project today, for the Excel Role column and the PM grouping: only
+     * ACTIVE memberships valid on `$now`, the same rule managedProjectIds() applies. `managesProject`
+     * is the role's flag, so a caller finds the PMs without knowing the role names.
+     */
+    public function rolesForProject(int $projectId, \DateTimeImmutable $now): array
     {
-        return $this->connection->fetchAllAssociative(
+        $at = $now->format('Y-m-d H:i:s');
+        $rows = $this->connection->fetchAllAssociative(
             'SELECT u.id AS userId, u.username AS username, u.email AS email,
-                    u.alias AS displayName, r.name AS role
+                    u.alias AS displayName, r.name AS role, r.manages_project AS managesProject
              FROM kimai2_project_memberships m
              INNER JOIN kimai2_project_roles r ON r.id = m.project_role_id
              INNER JOIN kimai2_users u ON u.id = m.user_id
-             WHERE m.project_id = ? AND m.active = 1
+             WHERE m.project_id = ?
+               AND m.active = 1
+               AND (m.valid_from IS NULL OR m.valid_from <= ?)
+               AND (m.valid_to IS NULL OR m.valid_to >= ?)
              ORDER BY u.username ASC',
-            [$projectId],
+            [$projectId, $at, $at],
+        );
+
+        return array_map(
+            static fn (array $row): array => [
+                'userId' => (int) $row['userId'],
+                'username' => (string) $row['username'],
+                'email' => $row['email'],
+                'displayName' => $row['displayName'],
+                'role' => (string) $row['role'],
+                'managesProject' => (bool) $row['managesProject'],
+            ],
+            $rows,
         );
     }
 }

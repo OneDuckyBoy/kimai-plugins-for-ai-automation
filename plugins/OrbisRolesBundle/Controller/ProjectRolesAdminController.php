@@ -9,6 +9,7 @@ use App\Utils\PageSetup;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
@@ -111,7 +112,19 @@ final class ProjectRolesAdminController extends AbstractController
         $roles = $this->connection->fetchAllAssociative('SELECT id, name, color FROM kimai2_project_roles ORDER BY name ASC');
         $roleColors = $this->roleColorByName($roles);
 
-        $projectForm = $this->createFormBuilder()
+        // The open project lives in the URL only (?project=N), so the assign form, a reload and the
+        // links all act on the project shown. Unknown or missing → the top project, so no click on
+        // "Open" is needed.
+        $projectIds = \array_map(fn($p) => (int) $p['id'], $projects);
+        $projectId = (int) $request->query->get('project', 0);
+        if (!\in_array($projectId, $projectIds, true)) {
+            $projectId = $projectIds[0] ?? 0;
+        }
+
+        // Each form has its own name: with Symfony's default ("form") for both, submitting one also
+        // counts as submitting the other.
+        $projectForm = $this->container->get('form.factory')
+            ->createNamedBuilder('project_pick', FormType::class, ['project' => $projectId])
             ->add('project', ChoiceType::class, [
                 'label' => 'Project',
                 'choices' => $this->toChoices($projects, 'name'),
@@ -119,17 +132,11 @@ final class ProjectRolesAdminController extends AbstractController
             ->add('open', SubmitType::class, ['label' => 'Open'])
             ->getForm();
         $projectForm->handleRequest($request);
-
-        $projectId = 0;
-        $members = [];
-        // Load the top project's members by default, so no click on "Open" is needed.
-        $defaultProjectId = $projects !== [] ? (int) $projects[0]['id'] : 0;
         if ($projectForm->isSubmitted() && $projectForm->isValid()) {
-            $projectId = (int) $projectForm->getData()['project'];
-        } else {
-            $projectId = (int) $request->query->get('project', $defaultProjectId);
+            return $this->redirectToRoute('orbis_roles_members', ['project' => (int) $projectForm->getData()['project']]);
         }
 
+        $members = [];
         if ($projectId > 0) {
             $members = $this->connection->fetchAllAssociative(
                 'SELECT m.user_id, m.project_role_id, m.active, m.valid_from, m.valid_to,
@@ -176,7 +183,13 @@ final class ProjectRolesAdminController extends AbstractController
                 'active' => (bool) $editMembership['active'],
             ]
             : ['active' => true];
-        $setForm = $this->createFormBuilder($setDefaults)
+        $setForm = $this->container->get('form.factory')
+            ->createNamedBuilder('assignment', FormType::class, $setDefaults, [
+                'action' => $this->generateUrl('orbis_roles_members', \array_filter([
+                    'project' => $projectId,
+                    'edit_user' => $editMembership ? $editUserId : null,
+                ])),
+            ])
             ->add('userId', ChoiceType::class, ['label' => 'Person', 'choices' => $this->toChoices($availableUsers, 'username')])
             ->add('roleId', ChoiceType::class, [
                 'label' => 'Role',

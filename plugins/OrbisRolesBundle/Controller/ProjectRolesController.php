@@ -39,11 +39,12 @@ final class ProjectRolesController extends AbstractController
             return $this->json(['message' => 'A positive project id is required (?project=N).'], Response::HTTP_BAD_REQUEST);
         }
 
-        $this->scope->requireReadProject($user, $projectId, new \DateTimeImmutable('now'));
+        $now = new \DateTimeImmutable('now');
+        $this->scope->requireReadProject($user, $projectId, $now);
 
         return $this->json([
             'project' => $projectId,
-            'roles' => $this->scope->rolesForProject($projectId),
+            'roles' => $this->scope->rolesForProject($projectId, $now),
         ]);
     }
 }

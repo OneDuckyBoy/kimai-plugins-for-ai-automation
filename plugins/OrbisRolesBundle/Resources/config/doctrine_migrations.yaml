@@ -1,0 +1,6 @@
+# Read by `kimai:bundle:orbisroles:install`. Paths are relative to this file; the plugin keeps
+# its own version table so Kimai's core migrations never see these.
+migrations_paths:
+  KimaiPlugin\OrbisRolesBundle\Migrations: ../../Migrations
+table_storage:
+  table_name: kimai2_bundle_migration_orbis_roles
